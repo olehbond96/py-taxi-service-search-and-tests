@@ -74,8 +74,14 @@ class ManufacturerDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("taxi:manufacturer-list")
 
 
+class ManufacturerDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Manufacturer
+    template_name = "taxi/manufacturer_detail.html"
+
+
 class CarListView(LoginRequiredMixin, generic.ListView):
     model = Car
+    context_object_name = "car_list"
     paginate_by = 5
     queryset = Car.objects.select_related("manufacturer")
 
@@ -83,7 +89,7 @@ class CarListView(LoginRequiredMixin, generic.ListView):
         queryset = Car.objects.select_related("manufacturer")
         model = self.request.GET.get("model")
         if model:
-            queryset = queryset.filter(mdel__icontainse=model)
+            queryset = queryset.filter(model__icontains=model)
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -116,13 +122,15 @@ class CarDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class DriverListView(LoginRequiredMixin, generic.ListView):
     model = Driver
+    context_object_name = "driver_list"
+    template_name = "taxi/driver_list.html"
     paginate_by = 5
 
     def get_queryset(self):
-        queryset = Driver.objects.all()
+        queryset = super().get_queryset()
         username = self.request.GET.get("username")
         if username:
-            return queryset.filter(username__icontains=username)
+            queryset = queryset.filter(username__icontains=username)
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -136,6 +144,7 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):
     model = Driver
+    template_name = "taxi/driver_detail.html"
     queryset = Driver.objects.all().prefetch_related("cars__manufacturer")
 
 
