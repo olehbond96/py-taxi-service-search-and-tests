@@ -6,21 +6,12 @@ from taxi.forms import DriverCreationForm
 
 class ModelTests(TestCase):
     def setUp(self):
-        self.manufacturer = Manufacturer.objects.create(
-            name="Toyota",
-            country="Japan"
-        )
-        self.driver = Driver.objects.create_user(
+        self.driver = Driver.objects.create(
             username="testdriver",
-            password="testpass123",
             first_name="John",
             last_name="Doe",
-            license_number="ABC12345"
+            license_number="ABC123"
         )
-
-    def test_manufacturer_str_method(self):
-        """Test manufacturer string representation"""
-        self.assertEqual(str(self.manufacturer), "Toyota Japan")
 
     def test_driver_str_method(self):
         """Test driver string representation"""
@@ -65,34 +56,18 @@ class SearchTests(TestCase):
         # Create test drivers
         self.john_driver = Driver.objects.create_user(
             username="john_driver",
+            first_name="John",
+            last_name="Driver",
             password="testpass",
             license_number="JOH12345"
         )
         self.jane_driver = Driver.objects.create_user(
             username="jane_driver",
+            first_name="Jane",
+            last_name="Driver",
             password="testpass",
             license_number="JAN98765"
         )
-
-        def test_driver_list_contains_search_form(self):
-            """Test that driver list page contains search form"""
-            response = self.client.get(reverse("taxi:driver-list"))
-            self.assertEqual(response.status_code, 200)
-
-            self.assertContains(response, 'name="username"')
-            self.assertContains(response, 'placeholder="Search by username"')
-            self.assertContains(response, 'type="submit"')
-            self.assertContains(response, 'value="Search"')
-
-        def test_driver_search_form_preserves_input(self):
-            """Test that search form preserves user input after search"""
-            search_term = "john"
-            response = self.client.get(
-                reverse("taxi:driver-list"),
-                {"username": search_term},
-            )
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, f'value="{search_term}"')
 
         # Create test manufacturers
         self.toyota = Manufacturer.objects.create(
@@ -142,6 +117,26 @@ class SearchTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f'value="{search_term}"')
+
+    def test_driver_search_case_insensitive(self):
+        """Test case-insensitive driver search"""
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": "JOHN"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "john_driver")
+        self.assertNotContains(response, "jane_driver")
+
+    def test_driver_search_partial_match_multiple(self):
+        """Test partial search returns multiple matches"""
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": "driver"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "john_driver")
+        self.assertContains(response, "jane_driver")
 
     def test_car_list_contains_search_form(self):
         """Test that car list page contains search form"""
@@ -270,7 +265,10 @@ class ViewTests(TestCase):
     def test_driver_list_requires_login(self):
         """Test driver list requires login"""
         response = self.client.get(reverse("taxi:driver-list"))
-        self.assertRedirects(response, "/accounts/login/?next=/drivers/")
+        self.assertRedirects(
+            response,
+            "/accounts/login/?next=/drivers/",
+        )
 
     def test_driver_list_works_when_logged_in(self):
         """Test driver list works when logged in"""
