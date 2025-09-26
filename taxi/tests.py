@@ -77,7 +77,6 @@ class SearchTests(TestCase):
             response = self.client.get(reverse("taxi:driver-list"))
             self.assertEqual(response.status_code, 200)
 
-
             self.assertContains(response, 'name="username"')
             self.assertContains(response, 'placeholder="Search by username"')
             self.assertContains(response, 'type="submit"')
@@ -86,7 +85,10 @@ class SearchTests(TestCase):
         def test_driver_search_form_preserves_input(self):
             """Test that search form preserves user input after search"""
             search_term = "john"
-            response = self.client.get(reverse("taxi:driver-list"), {"username": search_term})
+            response = self.client.get(
+                reverse("taxi:driver-list"),
+                {"username": search_term},
+            )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, f'value="{search_term}"')
 
@@ -114,7 +116,10 @@ class SearchTests(TestCase):
     def test_driver_search_form_preserves_input(self):
         """Test that search form preserves user input after search"""
         search_term = "john"
-        response = self.client.get(reverse("taxi:driver-list"), {"username": search_term})
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": search_term},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, f'value="{search_term}"')
 
@@ -134,28 +139,42 @@ class SearchTests(TestCase):
 
     def test_driver_search_by_username(self):
         """Test driver search by username - finds matching results"""
-        response = self.client.get(reverse("taxi:driver-list"), {"username": "john"})
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": "john"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "john_driver")
         self.assertNotContains(response, "jane_driver")
 
     def test_driver_search_no_results(self):
         """Test driver search with no matching results"""
-        response = self.client.get(reverse("taxi:driver-list"), {"username": "nonexistent"})
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": "nonexistent"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "john_driver")
         self.assertNotContains(response, "jane_driver")
 
     def test_driver_search_empty_shows_all(self):
         """Test driver search with empty query shows all drivers"""
-        response = self.client.get(reverse("taxi:driver-list"), {"username": ""})
+        response = self.client.get(
+            reverse("taxi:driver-list"),
+            {"username": ""},
+        )
+
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "john_driver")
         self.assertContains(response, "jane_driver")
 
     def test_car_search_by_model(self):
         """Test car search by model - finds matching results"""
-        response = self.client.get(reverse("taxi:car-list"), {"model": "cam"})
+        response = self.client.get(
+            reverse("taxi:car-list"),
+            {"model": "cam"},
+        )
+
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Camry")
         self.assertNotContains(response, "Civic")
@@ -163,20 +182,29 @@ class SearchTests(TestCase):
 
     def test_car_search_case_insensitive(self):
         """Test car search is case insensitive"""
-        response = self.client.get(reverse("taxi:car-list"), {"model": "CIVIC"})
+        response = self.client.get(
+            reverse("taxi:car-list"),
+            {"model": "CIVIC"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Civic")
 
     def test_car_search_partial_match(self):
         """Test car search with partial match"""
-        response = self.client.get(reverse("taxi:car-list"), {"model": "co"})
+        response = self.client.get(
+            reverse("taxi:car-list"),
+            {"model": "co"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Corolla")
         self.assertNotContains(response, "Camry")
 
     def test_manufacturer_search_by_name(self):
         """Test manufacturer search by name - finds matching results"""
-        response = self.client.get(reverse("taxi:manufacturer-list"), {"name": "toy"})
+        response = self.client.get(
+            reverse("taxi:manufacturer-list"),
+            {"name": "toy"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Toyota")
         self.assertNotContains(response, "Honda")
@@ -184,14 +212,20 @@ class SearchTests(TestCase):
 
     def test_manufacturer_search_exact_match(self):
         """Test manufacturer search with exact match"""
-        response = self.client.get(reverse("taxi:manufacturer-list"), {"name": "BMW"})
+        response = self.client.get(
+            reverse("taxi:manufacturer-list"),
+            {"name": "BMW"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "BMW")
         self.assertNotContains(response, "Toyota")
 
     def test_manufacturer_search_no_results(self):
         """Test manufacturer search with no matching results"""
-        response = self.client.get(reverse("taxi:manufacturer-list"), {"name": "Ferrari"})
+        response = self.client.get(
+            reverse("taxi:manufacturer-list"),
+            {"name": "Ferrari"},
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Toyota")
         self.assertNotContains(response, "Honda")
