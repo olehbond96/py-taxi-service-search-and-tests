@@ -13,6 +13,8 @@ class ModelTests(TestCase):
         self.driver = Driver.objects.create_user(
             username="testdriver",
             password="testpass123",
+            first_name="John",
+            last_name="Doe",
             license_number="ABC12345"
         )
 
@@ -261,6 +263,7 @@ class ViewTests(TestCase):
 
     def test_index_view_works(self):
         """Test index view loads correctly"""
+        self.client.force_login(self.user)
         response = self.client.get(reverse("taxi:index"))
         self.assertEqual(response.status_code, 200)
 
