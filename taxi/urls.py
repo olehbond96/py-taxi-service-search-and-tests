@@ -73,9 +73,7 @@ urlpatterns = [
     ),
     path("manufacturers/<int:pk>/",
         ManufacturerDetailView.as_view(),
-        name="manufacturer-detail"
+        name="manufacturer-detail",
     ),
-
 ]
-
 app_name = "taxi"

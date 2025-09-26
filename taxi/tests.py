@@ -93,14 +93,32 @@ class SearchTests(TestCase):
             self.assertContains(response, f'value="{search_term}"')
 
         # Create test manufacturers
-        self.toyota = Manufacturer.objects.create(name="Toyota", country="Japan")
-        self.honda = Manufacturer.objects.create(name="Honda", country="Japan")
-        self.bmw = Manufacturer.objects.create(name="BMW", country="Germany")
+        self.toyota = Manufacturer.objects.create(
+            name="Toyota",
+            country="Japan",
+        )
+        self.honda = Manufacturer.objects.create(
+            name="Honda",
+            country="Japan",
+        )
+        self.bmw = Manufacturer.objects.create(
+            name="BMW",
+            country="Germany",
+        )
 
         # Create test cars
-        self.camry = Car.objects.create(model="Camry", manufacturer=self.toyota)
-        self.civic = Car.objects.create(model="Civic", manufacturer=self.honda)
-        self.corolla = Car.objects.create(model="Corolla", manufacturer=self.toyota)
+        self.camry = Car.objects.create(
+            model="Camry",
+            manufacturer=self.toyota,
+        )
+        self.civic = Car.objects.create(
+            model="Civic",
+            manufacturer=self.honda,
+        )
+        self.corolla = Car.objects.create(
+            model="Corolla",
+            manufacturer=self.toyota,
+        )
 
         self.client.login(username="testuser", password="testpass123")
 
